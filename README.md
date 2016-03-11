@@ -40,7 +40,7 @@ helping tackle this, check out `sig`, a small utility which facilitates
 exchanging code signatures.
 
 
-## Sig
+## `sig`
 
 :construction: `sig` is an early proof of concept. Please try it out and give
 feedback, but proceed with caution! :construction:
@@ -62,7 +62,7 @@ Welcome to Signet! :)
 Let's create an attestation about a file we know about:
 
 ```sh
-$ sig attest signet.py
+$ sig attest ./signet.py
 I have reviewed this file (yes/no): yes
 It performs as expected and is free of major flaws (yes/no): yes
 Comment: My first attestation!
