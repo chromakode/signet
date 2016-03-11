@@ -744,7 +744,7 @@ class SigCLI(object):
 
         self.sig.attest(data)
         self.log.info('Saved attestation for {}:'.format(args.file))
-        self.log.info(json.dumps(data, indent=2))
+        self.log.info(json.dumps(data, indent=2, sort_keys=True))
 
     def cmd_verify(self, args):
         # TODO: add verbose mode to display comments, timestamps, replacements, etc

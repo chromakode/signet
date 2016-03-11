@@ -69,8 +69,8 @@ Comment: My first attestation!
 Saved attestation for ./signet.py:
 {
   "comment": "My first attestation!",
-  "ok": true,
   "id": "sha256:7c47d79b2e292c509fcdd546ea42427fe3cb02aca40577c1bd8c6f61948c28eb",
+  "ok": true,
   "reviewed": true
 }
 ```
