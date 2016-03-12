@@ -260,6 +260,10 @@ class RepoNotFoundError(Exception):
     pass
 
 
+class RepoUnreadableError(Exception):
+    pass
+
+
 class Repo(object):
     def __init__(self, path, keyid, keyring, secret_keyring):
         self.path = path
@@ -278,7 +282,10 @@ class Repo(object):
             raise RepoNotFoundError
 
         with open(self.path) as f:
-            attestation = json.load(f)
+            try:
+                attestation = json.load(f)
+            except ValueError:
+                raise RepoUnreadableError
 
         verify_attestation(attestation, self.keyring)
         LOGGER.getChild('repo').debug('attestation ok')
@@ -429,6 +436,7 @@ class Sig(object):
         self.own_repo.load()
 
         repos = [self.own_repo]
+        failed_repos = {}
         for remote_name in self.config['remotes']:
             repo_path = self.config.path('remotes/{}/repo.json'.format(remote_name))
             remote_repo = self.config.get_repo(repo_path)
@@ -438,8 +446,12 @@ class Sig(object):
             except RepoNotFoundError:
                 # ok to ignore for now, repo might not be fetched yet
                 pass
+            except RepoUnreadableError as e:
+                failed_repos[remote_name] = e
+                continue
             repos.append(remote_repo)
         self.repos = RepoSet(repos)
+        return failed_repos
 
     def setup_config_dir(self, keyid, config_dir=None):
         full_config_dir = os.path.expanduser(config_dir or '~/.signet')
@@ -655,6 +667,12 @@ class SigCLI(object):
 
         return parser
 
+    def load(self):
+        failed_repos = self.sig.load(os.environ.get('SIG_DIR'))
+        for remote_name, reason in failed_repos.iteritems():
+            if type(reason) is RepoUnreadableError:
+                self.log.warning('Unable to load remote repo "{}". Skipped.'.format(remote_name))
+
     def run(self, argv=None):
         parser = self._init_args_parser()
 
@@ -684,7 +702,7 @@ class SigCLI(object):
         LOGGER.addHandler(log_output)
 
         if command != 'setup':
-            self.sig.load(os.environ.get('SIG_DIR'))
+            self.load()
 
         getattr(self, 'cmd_' + command)(args)
 
