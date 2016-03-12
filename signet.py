@@ -1,9 +1,5 @@
 #!/usr/bin/python2
 from __future__ import print_function
-
-__version__ = '0.0.1'
-
-
 import argparse
 import base64
 import copy
@@ -18,6 +14,9 @@ import urllib2
 import urlparse
 from collections import defaultdict
 from datetime import datetime
+
+
+__version__ = '0.0.1'
 
 
 READ_SIZE = 65536
