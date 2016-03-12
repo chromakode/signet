@@ -1,5 +1,9 @@
 # Signet
 
+[![Build Status](https://img.shields.io/travis/chromakode/signet/master.svg?style=flat-square)](https://travis-ci.org/chromakode/signet)
+[![Coverage Status](https://img.shields.io/coveralls/chromakode/signet/master.svg?style=flat-square)](https://coveralls.io/github/chromakode/signet?branch=master)
+[![GitHub license](https://img.shields.io/github/license/chromakode/signet.svg?style=flat-square)](https://github.com/chromakode/signet/blob/master/LICENSE)
+
 Signet is a decentralized code signing network. Unlike traditional systems
 which focus on authors signing their releases, Signet enables third parties to
 publish cryptographically verified statements about software. These statements,
