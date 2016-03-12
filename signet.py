@@ -534,27 +534,33 @@ class Sig(object):
         return valid, categories
 
     def fetch_remote(self, name, remote, status_callback):
-        def download(url, dest):
-            status_callback('start', {'url': url, 'dest': dest})
+        def download(url):
+            status_callback('start', {'url': url})
             resp = urllib2.urlopen(url)
 
-            with open(dest, 'w') as f:
-                while True:
-                    data = resp.read(READ_SIZE)
-                    if not data:
-                        break
-                    f.write(data)
+            data = []
+            while True:
+                chunk = resp.read(READ_SIZE)
+                if not chunk:
+                    break
+                data.append(chunk)
 
-            status_callback('finish', {'url': url, 'dest': dest})
+            status_callback('finish', {'url': url})
+            return ''.join(data)
 
         repo_url = urlparse.urljoin(remote['url'], 'repo.json')
         repo_dir = self.config.path('remotes/{}'.format(name))
         touch_dir(repo_dir)
         repo_dest = os.path.join(repo_dir, 'repo.json')
-        download(repo_url, repo_dest)
+        repo_data = download(repo_url)
 
-        with open(repo_dest) as f:
-            attestation = json.load(f)
+        try:
+            attestation = json.loads(repo_data)
+        except ValueError as e:
+            raise RepoUnreadableError(e)
+
+        with open(repo_dest, 'w') as f:
+            f.write(repo_data)
 
         try:
             gpg_get_key_info(attestation['key'], keyring=self.config.keyring_path)
@@ -817,6 +823,8 @@ class SigCLI(object):
             except urllib2.HTTPError as e:
                 if not self.quiet:
                     print(self._c(str(e), 'RED'))
+            except RepoUnreadableError as e:
+                self.log.warning('Unable to read remote repo "{}": {}'.format(name, e))
 
     def cmd_publish(self, args):
         self.log.info('Signet servers are not ready yet.')
