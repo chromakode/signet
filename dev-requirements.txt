@@ -1,0 +1,6 @@
+flake8==2.2.4
+mccabe==0.4.0
+pep8==1.7.0
+pyflakes==1.1.0
+mock==1.0.1
+coverage==4.0.3
